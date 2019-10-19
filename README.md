@@ -1,5 +1,5 @@
 # Money-Transfer
-A REST Api for transferring money between accounts
+A RESTful API for transferring money between accounts
 
 # To run:
 
