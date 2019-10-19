@@ -33,6 +33,10 @@ You can then use Postman or a preferred tool to query the API
   
   /transactions
   
+  DELETE Routes
+  
+  /accounts/:id
+  
   The service is instantiated with some test data, this can be viewed in initialiseTestData() in MoneyTransferService.java
   or you can use the /accounts endpoint to list all accounts
 
