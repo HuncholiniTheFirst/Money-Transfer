@@ -35,3 +35,37 @@ You can then use Postman or a preferred tool to query the API
   
   The service is instantiated with some test data, this can be viewed in initialiseTestData() in MoneyTransferService.java
   or you can use the /accounts endpoint to list all accounts
+
+
+# JSON Examples:
+
+New account
+
+{
+ "currency" : "GBP",
+ "user" : "New User",
+ "balance" : "999999"
+}
+
+Transfer
+
+{
+ "amount" : "500000",
+ "fromAccountID" : "2cjpLZ",
+ "toAccountID" : "0tUI9Q"
+}
+
+Deposit
+
+{
+ "amount" : "100000",
+ "toAccount" : "100abc"
+}
+
+
+Withdraw
+
+{
+ "amount" : "100000",
+ "fromAccount" : "100abc"
+}
