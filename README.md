@@ -5,7 +5,7 @@ A REST Api for transferring money between accounts
 
 Run main.java, the port the service is listening on will be printed to standard output.
 
-You can then use postman or a preferred tool to query the API
+You can then use Postman or a preferred tool to query the API
 
 # Routes:
 
