@@ -47,6 +47,8 @@ public class MoneyTransferService extends AbstractVerticle {
         router.route().method(HttpMethod.GET).path("/accounts/:accID/transactions").handler(this::getAllTransactionsForAccount);
         router.route().method(HttpMethod.GET).path("/accounts/:accID/transactions/:transID").handler(this::getTransactionForAccount);
         router.route().method(HttpMethod.GET).path("/transactions").handler(this::getAllTransactions);
+        // DELETE Routes
+        router.route().method(HttpMethod.DELETE).path("/accounts/:id").handler(this::deleteAccount);
 
         initialiseTestData(existingAccounts);
 
@@ -209,7 +211,7 @@ public class MoneyTransferService extends AbstractVerticle {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.enableDefaultTyping();
 
-                    if(targetAccount.getBalance().compareTo(withdrawal.getAmount()) < 1){
+                    if (targetAccount.getBalance().compareTo(withdrawal.getAmount()) < 1) {
                         routingContext.response()
                                 .setStatusCode(400)
                                 .putHeader("content-type", "application/json; charset=utf-8")
@@ -247,7 +249,7 @@ public class MoneyTransferService extends AbstractVerticle {
         if (id == null) {
             routingContext.response().setStatusCode(400).end("ID was null, no ID on the request!");
         } else {
-            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts,accountID);
+            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts, accountID);
             if (targetAccount == null) {
                 routingContext.response().setStatusCode(404).end("No accounts exist with this ID!");
             } else {
@@ -287,7 +289,7 @@ public class MoneyTransferService extends AbstractVerticle {
         if (transactionID == null) {
             routingContext.response().setStatusCode(400).end("No transaction ID found on the request!");
         } else {
-            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts,accountID);
+            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts, accountID);
             if (targetAccount == null) {
                 routingContext.response().setStatusCode(404).end("No accounts exist with this ID!");
                 return;
@@ -309,6 +311,28 @@ public class MoneyTransferService extends AbstractVerticle {
         routingContext.response()
                 .putHeader("content-type", "application/json; charset=utf-8")
                 .end(Json.encodePrettily(allTransactions));
+    }
+
+    private void deleteAccount(RoutingContext routingContext) {
+        final String id = routingContext.request().getParam("id");
+        AccountID accountID = new AccountID(id);
+        if (id == null) {
+            routingContext.response().setStatusCode(400).end("ID was null, no ID on the request!");
+        } else {
+            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts, accountID);
+            if (targetAccount == null) {
+                routingContext.response().setStatusCode(404).end("No accounts exist with this ID!");
+            } else {
+                if (TransferMethods.removeExistingAccount(existingAccounts, accountID)) {
+                    routingContext.response().setStatusCode(204)
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end("Account deleted.");
+                } else {
+                    routingContext.response().setStatusCode(404).end("This account wasn't recognised as an existing account");
+                }
+
+            }
+        }
     }
 
 

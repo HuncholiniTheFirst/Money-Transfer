@@ -70,4 +70,14 @@ public class TransferMethods {
         }
         return null;
     }
+
+    public static boolean removeExistingAccount(Map<AccountID,Account> existingAccounts, AccountID accountID){
+        for(Map.Entry<AccountID,Account> existingAccount : existingAccounts.entrySet()){
+            if(existingAccount.getKey().equals(accountID)){
+                existingAccounts.remove(existingAccount.getKey());
+                return true;
+            }
+        }
+        return false;
+    }
 }
