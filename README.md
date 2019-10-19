@@ -1,10 +1,11 @@
 # Money-Transfer
 A REST Api for transferring money between accounts
 
-To run:
+# To run:
+
 Run main.java, the port the service is listening on will be printed to standard output.
 
-Routes:
+# Routes:
 
   POST Routes
   
