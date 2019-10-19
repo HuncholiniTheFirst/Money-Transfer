@@ -37,7 +37,7 @@ You can then use Postman or a preferred tool to query the API
   or you can use the /accounts endpoint to list all accounts
 
 
-# JSON Examples:
+# JSON body examples:
 
 New account
 
