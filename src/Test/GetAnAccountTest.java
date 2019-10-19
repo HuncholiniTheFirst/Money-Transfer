@@ -2,7 +2,6 @@ package Test;
 
 import Models.*;
 import Models.ID.AccountID;
-import Models.ID.ShortRandomID;
 import ServiceVerticle.MoneyTransferService;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;

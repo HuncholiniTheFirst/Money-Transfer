@@ -3,6 +3,7 @@ package Models.Transaction;
 import Models.ID.TransactionID;
 
 public abstract class Transaction {
+
     private TransactionID transactionID;
 
     public Transaction() {

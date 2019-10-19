@@ -90,8 +90,8 @@ public class Account {
         this.transactions = transactions;
     }
 
-    public void addTransaction(Transfer transfer) {
-        this.transactions.add(transfer);
+    public void addTransaction(Transaction transaction) {
+        this.transactions.add(transaction);
     }
 
     public boolean containsTransaction(TransactionID transactionID) {

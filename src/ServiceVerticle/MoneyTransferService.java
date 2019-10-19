@@ -5,10 +5,13 @@ import Models.Account;
 import Models.Currency;
 import Models.ID.AccountID;
 import Models.ID.TransactionID;
+import Models.Transaction.Deposit;
 import Models.Transaction.Transaction;
 import Models.Transaction.Transfer;
+import Models.Transaction.Withdrawal;
 import Models.User;
 import Utils.TransferMethods;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
@@ -35,6 +38,9 @@ public class MoneyTransferService extends AbstractVerticle {
         // POST Routes
         router.route().method(HttpMethod.POST).path("/transfer").handler(this::handleTransfer);
         router.route().method(HttpMethod.POST).path("/account/new").handler(this::addNewAccount);
+        // PUT Routes
+        router.route().method(HttpMethod.PUT).path("/deposit").handler(this::addFundsToAccount);
+        router.route().method(HttpMethod.PUT).path("/withdraw").handler(this::withdrawFundsFromAccount);
         // GET Routes
         router.route().method(HttpMethod.GET).path("/accounts").handler(this::getAllAccounts);
         router.route().method(HttpMethod.GET).path("/accounts/:id").handler(this::getAnAccount);
@@ -133,7 +139,99 @@ public class MoneyTransferService extends AbstractVerticle {
             routingContext.response()
                     .setStatusCode(400)
                     .putHeader("content-type", "application/json; charset=utf-8")
-                    .end("Error when creating new account" + e.toString());
+                    .end("Error when creating new account: " + e.toString());
+        }
+    }
+
+    private void addFundsToAccount(RoutingContext routingContext) {
+        String bodyAsString = routingContext.getBodyAsString();
+        if (bodyAsString == null) {
+            routingContext.response()
+                    .setStatusCode(400)
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end("No body on PUT request for new deposit! Can't see any deposit details!");
+        }
+        final Deposit newDeposit = Json.decodeValue(bodyAsString, Deposit.class);
+
+        AccountID accountID = newDeposit.getToAccount();
+        if (accountID == null) {
+            routingContext.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
+                    .end("No account supplied in deposit request!");
+        } else {
+            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts, accountID);
+            if (targetAccount == null) {
+                routingContext.response().setStatusCode(404).putHeader("content-type", "application/json; charset=utf-8")
+                        .end("No accounts exist with the ID " + accountID.getId());
+            } else {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.enableDefaultTyping();
+
+                    targetAccount.setBalance(targetAccount.getBalance().add(newDeposit.getAmount()));
+                    targetAccount.addTransaction(newDeposit);
+                    allTransactions.add(newDeposit);
+                    routingContext.response()
+                            .setStatusCode(200)
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end(mapper.writeValueAsString(targetAccount));
+                } catch (Exception e) {
+                    routingContext.response()
+                            .setStatusCode(501)
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end("Error when trying to deposit to account: " + e.toString());
+                }
+
+            }
+        }
+    }
+
+    private void withdrawFundsFromAccount(RoutingContext routingContext) {
+        String bodyAsString = routingContext.getBodyAsString();
+        if (bodyAsString == null) {
+            routingContext.response()
+                    .setStatusCode(400)
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .end("No body on PUT request for new withdrawal! Can't see any withdrawal details!");
+        }
+        final Withdrawal withdrawal = Json.decodeValue(bodyAsString, Withdrawal.class);
+
+        AccountID accountID = withdrawal.getToAccount();
+        if (accountID == null) {
+            routingContext.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
+                    .end("No account supplied in deposit request!");
+        } else {
+            Account targetAccount = TransferMethods.getExistingAccount(existingAccounts, accountID);
+            if (targetAccount == null) {
+                routingContext.response().setStatusCode(404).putHeader("content-type", "application/json; charset=utf-8")
+                        .end("No accounts exist with the ID " + accountID.getId());
+            } else {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.enableDefaultTyping();
+
+                    if(targetAccount.getBalance().compareTo(withdrawal.getAmount()) < 1){
+                        routingContext.response()
+                                .setStatusCode(400)
+                                .putHeader("content-type", "application/json; charset=utf-8")
+                                .end("This account does not have enough funds for this withdrawal");
+                        return;
+                    }
+
+                    targetAccount.setBalance(targetAccount.getBalance().subtract(withdrawal.getAmount()));
+                    targetAccount.addTransaction(withdrawal);
+                    allTransactions.add(withdrawal);
+                    routingContext.response()
+                            .setStatusCode(200)
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end(mapper.writeValueAsString(targetAccount));
+                } catch (Exception e) {
+                    routingContext.response()
+                            .setStatusCode(501)
+                            .putHeader("content-type", "application/json; charset=utf-8")
+                            .end("Error when trying to withdraw from account: " + e.toString());
+                }
+
+            }
         }
     }
 
