@@ -2,7 +2,6 @@ package Test;
 
 import Models.Account;
 import Models.ID.AccountID;
-import Models.Transaction.Deposit;
 import Models.Transaction.Withdrawal;
 import ServiceVerticle.MoneyTransferService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,14 +68,14 @@ public class WithdrawFundsTest {
     @Test
     public void testASuccessfulWithdrawal(TestContext context) {
         Async async = context.async();
-        final String testDeposit = Json.encodePrettily(new Deposit(new BigDecimal("5"), new AccountID("100abc")));
+        final String testWithdrawal = Json.encodePrettily(new Withdrawal(new BigDecimal("5"), new AccountID("100abc")));
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.enableDefaultTyping();
 
         vertx.createHttpClient().put(port, "localhost", "/withdraw")
                 .putHeader("content-type", "application/json")
-                .putHeader("content-length", Integer.toString(testDeposit.length()))
+                .putHeader("content-length", Integer.toString(testWithdrawal.length()))
                 .handler(response -> {
                     context.assertEquals(response.statusCode(), 200);
                     context.assertTrue(response.headers().get("content-type").contains("application/json"));
@@ -93,7 +92,7 @@ public class WithdrawFundsTest {
 
                     });
                 })
-                .write(testDeposit)
+                .write(testWithdrawal)
                 .end();
         async.awaitSuccess(5000);
     }
@@ -101,14 +100,14 @@ public class WithdrawFundsTest {
     @Test
     public void testInsufficientFundsWithdrawal(TestContext context) {
         Async async = context.async();
-        final String testDeposit = Json.encodePrettily(new Deposit(new BigDecimal("15"), new AccountID("100abc")));
+        final String testWithdrawal = Json.encodePrettily(new Withdrawal(new BigDecimal("15"), new AccountID("100abc")));
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.enableDefaultTyping();
 
         vertx.createHttpClient().put(port, "localhost", "/withdraw")
                 .putHeader("content-type", "application/json")
-                .putHeader("content-length", Integer.toString(testDeposit.length()))
+                .putHeader("content-length", Integer.toString(testWithdrawal.length()))
                 .handler(response -> {
                     context.assertEquals(response.statusCode(), 400);
                     context.assertTrue(response.headers().get("content-type").contains("application/json"));
@@ -118,7 +117,7 @@ public class WithdrawFundsTest {
 
                     });
                 })
-                .write(testDeposit)
+                .write(testWithdrawal)
                 .end();
         async.awaitSuccess(5000);
     }

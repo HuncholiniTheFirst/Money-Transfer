@@ -6,22 +6,22 @@ import java.math.BigDecimal;
 
 public class Withdrawal extends Transaction {
     private BigDecimal amount;
-    private AccountID toAccount;
+    private AccountID fromAccount;
 
     public Withdrawal() {
     }
 
     public Withdrawal(BigDecimal amount, AccountID fromAccount) {
         this.amount = amount;
-        this.toAccount = fromAccount;
+        this.fromAccount = fromAccount;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public AccountID getToAccount() {
-        return toAccount;
+    public AccountID getFromAccount() {
+        return fromAccount;
     }
 
 

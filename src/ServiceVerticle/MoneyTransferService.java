@@ -195,7 +195,7 @@ public class MoneyTransferService extends AbstractVerticle {
         }
         final Withdrawal withdrawal = Json.decodeValue(bodyAsString, Withdrawal.class);
 
-        AccountID accountID = withdrawal.getToAccount();
+        AccountID accountID = withdrawal.getFromAccount();
         if (accountID == null) {
             routingContext.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
                     .end("No account supplied in deposit request!");
