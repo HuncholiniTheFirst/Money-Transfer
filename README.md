@@ -38,7 +38,7 @@ You can then use Postman or a preferred tool to query the API
   /accounts/:id
   
   The service is instantiated with some test data, this can be viewed in initialiseTestData() in MoneyTransferService.java
-  or you can use the /accounts endpoint to list all accounts
+  or you can use the /accounts endpoint to list all test accounts
 
 
 # JSON body examples:
